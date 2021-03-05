@@ -14,6 +14,14 @@ $(() => {
             <li>number_of_bathrooms: ${property.number_of_bathrooms}</li>
             <li>parking_spaces: ${property.parking_spaces}</li>
           </ul>
+          <form class="reservation-form" action="/api/reservations" method="POST">
+            <input name="propertyId" type="hidden" value="${property.id}">
+            <label for="reservation-start-date">Start date:</label>
+            <input type="date" name="reservation_start_date" value="2021-03-04" min="2021-01-01" max="2022-12-31">
+            <label for="reservation-end-date">End date:</label>
+            <input type="date" name="reservation_end_date" value="2021-03-04" min="2021-01-01" max="2022-12-31">
+            <button class="reservation-button" type="submit">Make Reservation</button>
+          </form>
           ${isReservation ? 
             `<p>${moment(property.start_date).format('ll')} - ${moment(property.end_date).format('ll')}</p>` 
             : ``}
@@ -27,5 +35,21 @@ $(() => {
   }
 
   window.propertyListing.createListing = createListing;
+
+  $(document).on('submit', ".reservation-form", function (event) {
+    event.preventDefault();
+    views_manager.show('none');
+
+    const data = $(this).serialize();
+    submitReservation(data)
+    .then(() => {
+      views_manager.show('confirm', "Successfully reserved! You may view your new reservation under 'My Reservations'.");
+      return;
+    })
+    .catch((error) => {
+      console.error(error);
+      views_manager.show('listings');
+    })
+  });
 
 });

@@ -27,13 +27,22 @@ $(() => {
       case 'signUp':
         $signUpForm.appendTo($main);
         break;
+      case 'confirm':
+        const $confirm = $(`<p>${arguments[1]}</p>`);
+        $confirm.appendTo('body');
+        // setTimeout(() => {
+        //   $confirm.remove();
+        //   views_manager.show('listings');
+        // }, 3000);
+        
+        break;
       case 'error': {
         const $error = $(`<p>${arguments[1]}</p>`);
         $error.appendTo('body');
         setTimeout(() => {
           $error.remove();
           views_manager.show('listings');
-        }, 2000);
+        }, 3000);
         
         break;
       }

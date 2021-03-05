@@ -90,6 +90,42 @@ const getAllReservations = function(guest_id, limit = 10) {
 }
 exports.getAllReservations = getAllReservations;
 
+const addReservation = function(reservation) {
+  console.log('database file')
+  console.log('reservation is', reservation);
+  const queryParams = [];
+  let queryString = `
+    INSERT INTO reservations (
+    guest_id, property_id, start_date, end_date) 
+    VALUES (
+  `;
+
+  queryParams.push(`${reservation.owner_id}`);
+  queryString += `$${queryParams.length}, `;
+
+  queryParams.push(`${Number(reservation.propertyId)}`);
+  queryString += `$${queryParams.length}, `;
+
+  queryParams.push(`${reservation.reservation_start_date}`);
+  queryString += `$${queryParams.length}, `;
+
+  queryParams.push(`${reservation.reservation_end_date}`);
+  queryString += `$${queryParams.length}`;
+
+  queryString += `)
+  RETURNING *;
+  `;
+
+  console.log(queryString, queryParams);
+
+  return pool.query(queryString, queryParams)
+  .then(res => {
+    console.log('res.rows[0] is', res.rows[0])
+    return res.rows[0];
+  });
+}
+exports.addReservation = addReservation;
+
 /// Properties
 
 /**
@@ -104,7 +140,7 @@ const getAllProperties = function(options, limit = 10) {
   let queryString = `
     SELECT properties.*, avg(property_reviews.rating) as average_rating
     FROM properties
-    JOIN property_reviews ON properties.id = property_id
+    LEFT JOIN property_reviews ON properties.id = property_id
   `;
 
   if (options.city) {
